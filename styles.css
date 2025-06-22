@@ -66,14 +66,16 @@ p {
 
 /* Stil für den Blumenstrauß-Container */
 .flower-bouquet {
-    width: min(80%, 400px);
-    height: 300px;
-    margin: clamp(1rem, 3vw, 2rem) auto;
+    width: min(90%, 500px);  /* Breiter für mehr Details */
+    height: 400px;           /* Höher für den prächtigen Strauß */
+    margin: clamp(1.5rem, 4vw, 3rem) auto;
     position: relative;
-    border-radius: clamp(10px, 2vw, 15px);
+    border-radius: clamp(12px, 2.5vw, 20px);
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     background: linear-gradient(135deg, #fff5f8 0%, #fff 100%);
+    transform-style: preserve-3d;
+    perspective: 1000px;
 }
 
 #bouquet-canvas {
@@ -153,8 +155,16 @@ p {
     }
     
     .flower-bouquet {
-        height: 200px;
-        width: min(50%, 300px);
+        height: 250px;
+        width: min(60%, 400px);
+    }
+}
+
+/* Für kleinere Bildschirme */
+@media (max-width: 480px) {
+    .flower-bouquet {
+        width: 95%;
+        height: 350px;
     }
 }
 

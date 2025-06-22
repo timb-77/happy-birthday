@@ -26,40 +26,57 @@ function isHighPerformanceDevice() {
 function createFlower(color, size) {
     const group = new THREE.Group();
     
-    // Blütenblätter
-    const petalGeometry = new THREE.ConeGeometry(size * 0.2, size * 0.5, 4);
+    // Mehr Blütenblätter
+    const petalCount = 12;
+    const petalGeometry = new THREE.ConeGeometry(size * 0.2, size * 0.5, 8);
     const petalMaterial = new THREE.MeshPhongMaterial({
         color: color,
         shininess: 100,
         side: THREE.DoubleSide
     });
 
-    for (let i = 0; i < 8; i++) {
+    // Innere und äußere Blütenblätter
+    for (let i = 0; i < petalCount; i++) {
+        // Äußere Blütenblätter
         const petal = new THREE.Mesh(petalGeometry, petalMaterial);
         petal.position.y = size * 0.25;
-        petal.rotation.z = (Math.PI / 4) * i;
+        petal.rotation.z = (Math.PI * 2 / petalCount) * i;
         petal.rotation.x = Math.PI / 3;
         group.add(petal);
+
+        // Innere Blütenblätter, etwas kleiner und versetzt
+        if (i % 2 === 0) {
+            const innerPetal = new THREE.Mesh(petalGeometry, petalMaterial);
+            innerPetal.scale.set(0.7, 0.7, 0.7);
+            innerPetal.position.y = size * 0.2;
+            innerPetal.rotation.z = (Math.PI * 2 / petalCount) * i + Math.PI / petalCount;
+            innerPetal.rotation.x = Math.PI / 3;
+            group.add(innerPetal);
+        }
     }
 
-    // Blütenmitte
-    const centerGeometry = new THREE.SphereGeometry(size * 0.15, 8, 8);
+    // Blütenmitte mit mehr Details
+    const centerGeometry = new THREE.SphereGeometry(size * 0.18, 16, 16);
     const centerMaterial = new THREE.MeshPhongMaterial({
-        color: 0xffff00,
+        color: 0xffd700,
         shininess: 80
     });
     const center = new THREE.Mesh(centerGeometry, centerMaterial);
     center.position.y = size * 0.25;
     group.add(center);
 
-    // Stiel
-    const stemGeometry = new THREE.CylinderGeometry(size * 0.02, size * 0.02, size);
+    // Stängel mit Verdickung am oberen Ende
+    const stemGeometry = new THREE.CylinderGeometry(
+        size * 0.04, // Oben dicker
+        size * 0.02, // Unten dünner
+        size * 1.2   // Etwas länger
+    );
     const stemMaterial = new THREE.MeshPhongMaterial({
-        color: 0x00aa00,
+        color: 0x228B22,
         shininess: 30
     });
     const stem = new THREE.Mesh(stemGeometry, stemMaterial);
-    stem.position.y = -size * 0.25;
+    stem.position.y = -size * 0.35;
     group.add(stem);
 
     return group;
@@ -143,8 +160,8 @@ function initBouquet() {
     scene.background = new THREE.Color(0xffffff);
     
     const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    camera.position.z = 5;
-    camera.position.y = 2;
+    camera.position.z = 6;  // Etwas weiter weg für bessere Übersicht
+    camera.position.y = 1;  // Nicht mehr so weit oben
     camera.lookAt(0, 0, 0);
     
     const renderer = new THREE.WebGLRenderer({ 
@@ -155,40 +172,101 @@ function initBouquet() {
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Beleuchtung
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // Verbesserte Beleuchtung
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
 
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+    directionalLight2.position.set(-5, 3, -5);
+    scene.add(directionalLight2);
+
     // Blumenstrauß erstellen
     const bouquet = new THREE.Group();
-    const flowerColors = [0xff69b4, 0xff1493, 0xff69b4, 0xffc0cb, 0xff69b4];
-    const flowerPositions = [
-        [0, 0, 0],
-        [-0.5, -0.3, 0.3],
-        [0.5, -0.2, 0.2],
-        [0.3, 0.2, -0.3],
-        [-0.3, 0.1, -0.2]
+    
+    // Mehr Farben für einen prächtigeren Strauß
+    const flowerColors = [
+        0x8B0000,  // Dunkelrot
+        0xFFA500,  // Orange
+        0xFFD700,  // Gold/Gelb
+        0x800080,  // Lila
+        0x9400D3,  // Violett
+        0xFF1493,  // Pink
+        0xFF69B4,  // Rosa
+        0x8B0000,  // Dunkelrot
+        0xFFA500,  // Orange
+        0x800080,  // Lila
+        0xFF1493,  // Pink
+        0xFFD700   // Gold/Gelb
     ];
 
+    // Mehr Positionen für die Blumen, in einer natürlicheren Anordnung
+    const flowerPositions = [
+        // Zentrale Blumen
+        [0, 0.5, 0],      // Mittlere Hauptblume
+        [-0.4, 0.3, 0.2], // Links oben
+        [0.4, 0.4, 0.1],  // Rechts oben
+        [0, 0.6, -0.3],   // Hinten mitte
+        
+        // Äußere Blumen
+        [-0.8, -0.2, 0.4],  // Links außen
+        [0.8, -0.1, 0.3],   // Rechts außen
+        [0.5, 0.2, -0.5],   // Hinten rechts
+        [-0.5, 0.1, -0.4],  // Hinten links
+        
+        // Füllblumen
+        [-0.3, -0.3, 0.2],  // Unten links
+        [0.3, -0.2, 0.1],   // Unten rechts
+        [0, -0.4, -0.2],    // Unten mitte
+        [0.2, 0.3, -0.3]    // Oben mitte
+    ];
+
+    // Verschiedene Größen für mehr Dynamik
+    const flowerSizes = [
+        1.2, // Hauptblume
+        1.0, 1.0, 1.0,  // Obere Blumen
+        0.9, 0.9, 0.9, 0.9,  // Äußere Blumen
+        0.8, 0.8, 0.8, 0.8   // Füllblumen
+    ];
+
+    // Erstelle alle Blumen
     flowerColors.forEach((color, i) => {
-        const flower = createFlower(color, 1);
+        const flower = createFlower(color, flowerSizes[i]);
         flower.position.set(...flowerPositions[i]);
-        flower.rotation.x = Math.random() * 0.3;
-        flower.rotation.z = Math.random() * 0.3;
+        
+        // Zufällige Rotation für natürlicheres Aussehen
+        flower.rotation.x = Math.random() * 0.4 - 0.2;
+        flower.rotation.z = Math.random() * 0.4 - 0.2;
+        flower.rotation.y = Math.random() * Math.PI * 2; // Volle Rotation um Y-Achse möglich
+        
         bouquet.add(flower);
     });
 
+    // Füge einige Blätter hinzu
+    const leafColor = 0x228B22; // Waldgrün
+    for (let i = 0; i < 8; i++) {
+        const leaf = createLeaf(leafColor, 1.2);
+        leaf.position.set(
+            Math.random() * 2 - 1,  // X: -1 bis 1
+            Math.random() * -0.5,    // Y: Unterer Bereich
+            Math.random() * 2 - 1   // Z: -1 bis 1
+        );
+        leaf.rotation.x = Math.random() * 0.5 - 0.25;
+        leaf.rotation.y = Math.random() * Math.PI * 2;
+        leaf.rotation.z = Math.random() * 0.5 - 0.25;
+        bouquet.add(leaf);
+    }
+
     scene.add(bouquet);
-    bouquet.rotation.x = -0.2;
+    bouquet.rotation.x = -0.2;  // Leichte Neigung nach vorne
 
     let animationFrameId;
     function animate() {
         animationFrameId = requestAnimationFrame(animate);
-        bouquet.rotation.y += 0.005;
+        bouquet.rotation.y += 0.003; // Langsamere Rotation
         bouquet.position.y = Math.sin(Date.now() * 0.001) * 0.1;
         renderer.render(scene, camera);
     }
@@ -216,6 +294,28 @@ function initBouquet() {
         });
         renderer.dispose();
     };
+}
+
+// Neue Funktion für Blätter
+function createLeaf(color, size) {
+    const group = new THREE.Group();
+    
+    // Blattform als abgeflachter, gebogener Kegel
+    const leafGeometry = new THREE.ConeGeometry(size * 0.15, size * 0.6, 8, 1, true);
+    leafGeometry.scale(1, 1, 0.2); // Abflachen
+    
+    // Materialien mit verschiedenen Grüntönen
+    const leafMaterial = new THREE.MeshPhongMaterial({
+        color: color,
+        shininess: 30,
+        side: THREE.DoubleSide
+    });
+
+    const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+    leaf.rotation.x = Math.PI / 2; // Horizontal ausrichten
+    group.add(leaf);
+
+    return group;
 }
 
 // Hauptinitialisierung
