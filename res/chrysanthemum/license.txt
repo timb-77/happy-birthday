@@ -1,0 +1,8 @@
+Model Information:
+* title:	chrysanthemum
+* source:	https://sketchfab.com/3d-models/chrysanthemum-473025cc312f4930af87837d395ccc0b
+* author:	quyrommap (https://sketchfab.com/quyrommap)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
