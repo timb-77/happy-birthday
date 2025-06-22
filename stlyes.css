@@ -1,0 +1,119 @@
+@charset "UTF-8";
+
+body {
+    font-family: 'Inter', sans-serif; /* Standard-Schriftart, Inter ist modern und gut lesbar */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column; /* Elemente vertikal anordnen */
+    justify-content: center; /* Vertikal zentrieren */
+    align-items: center; /* Horizontal zentrieren */
+    min-height: 100vh; /* Mindesthöhe des Viewports */
+    background: linear-gradient(135deg, #fce4ec 0%, #e0f2f7 100%); /* Sanfter Farbverlauf */
+    color: #333;
+    text-align: center;
+    overflow: hidden; /* Verhindert Scrollbalken bei Animationen */
+    position: relative; /* Für absolute Positionierung von Elementen */
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.9); /* Leicht transparenter Hintergrund */
+    padding: 2.5rem 1.5rem; /* Mehr Polsterung für bessere Lesbarkeit */
+    border-radius: 25px; /* Stark abgerundete Ecken */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Weicherer Schatten */
+    max-width: 90%; /* Max. Breite für Mobilgeräte */
+    margin: 1.5rem; /* Abstand von den Rändern */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Abstand zwischen den Elementen im Container */
+    position: relative;
+    z-index: 2; /* Damit es über den Partikeln liegt */
+}
+
+/* Überschrift für den Geburtstagsgruß */
+h1 {
+    color: #d81b60; /* Eine schöne Rosenfarbe */
+    font-size: 2.5em; /* Größere Schrift für mobile Überschrift */
+    margin-bottom: 0.5rem;
+    animation: fadeInDown 1.5s ease-out; /* Animation beim Laden */
+}
+
+/* Grußtext */
+p {
+    font-size: 1.1em; /* Gut lesbar auf Mobilgeräten */
+    line-height: 1.6;
+    animation: fadeInUp 1.5s ease-out; /* Animation beim Laden */
+    animation-delay: 0.3s; /* Verzögerung gegenüber der Überschrift */
+}
+
+/* Stil für das Blumenstrauß-Bild */
+.flower-bouquet {
+    max-width: 80%; /* Bildgröße relativ zur Containerbreite */
+    height: auto;
+    border-radius: 15px; /* Leicht abgerundete Ecken für das Bild */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+    animation: zoomIn 1.5s ease-out; /* Animation beim Laden */
+    animation-delay: 0.6s; /* Verzögerung gegenüber dem Text */
+}
+
+/* Für Desktop-Ansichten: Anpassen der Schriftgrößen und des Layouts */
+@media (min-width: 768px) {
+    .container {
+        max-width: 600px; /* Max. Breite für Tablets/Desktops */
+        padding: 3rem 2rem;
+    }
+
+    h1 {
+        font-size: 3.5em; /* Größere Schrift auf Desktops */
+    }
+
+    p {
+        font-size: 1.3em;
+    }
+}
+
+/* Animationen */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Basis für Partikeleffekte (WebGL/JS) */
+#webgl-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Im Hintergrund */
+    pointer-events: none; /* Klicks durchlassen */
+}
