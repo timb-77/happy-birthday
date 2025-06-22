@@ -53,16 +53,52 @@ p {
     margin: 0 auto;
 }
 
-/* Stil für das Blumenstrauß-Bild */
+/* Hintergrund-Canvas für Partikel */
+#background-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Stil für den Blumenstrauß-Container */
 .flower-bouquet {
     width: min(80%, 400px);
-    height: auto;
-    border-radius: clamp(10px, 2vw, 15px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    height: 300px;
     margin: clamp(1rem, 3vw, 2rem) auto;
-    animation: zoomIn 1.5s ease-out;
-    animation-delay: 0.6s;
+    position: relative;
+    border-radius: clamp(10px, 2vw, 15px);
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #fff5f8 0%, #fff 100%);
+}
+
+#bouquet-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+/* Fallback-Bild (wird nur angezeigt, wenn WebGL nicht verfügbar ist) */
+.flower-bouquet-fallback {
+    display: none;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+}
+
+.no-webgl .flower-bouquet-fallback {
+    display: block;
+}
+
+.no-webgl #bouquet-canvas {
+    display: none;
 }
 
 /* Touch-Geräte Optimierungen */
@@ -117,6 +153,7 @@ p {
     }
     
     .flower-bouquet {
+        height: 200px;
         width: min(50%, 300px);
     }
 }
@@ -153,15 +190,4 @@ p {
         opacity: 1;
         transform: scale(1);
     }
-}
-
-/* Basis für Partikeleffekte (WebGL/JS) */
-#webgl-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1; /* Im Hintergrund */
-    pointer-events: none; /* Klicks durchlassen */
 }
