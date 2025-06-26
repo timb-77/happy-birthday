@@ -219,8 +219,8 @@ function initBouquet() {
                 bouquet = gltf.scene;
                 
                 // Modell viel größer skalieren und besser positionieren
-                bouquet.scale.set(8, 8, 8);  // Viel größer machen (war 2,2,2)
-                bouquet.position.set(0, -0.5, 0);  // Weniger nach unten verschieben
+                bouquet.scale.set(9, 9, 9);  // Viel größer machen (war 2,2,2)
+                bouquet.position.set(0, -1.7, 0);  // Weniger nach unten verschieben
                 bouquet.rotation.x = -0.1;  // Leichte Neigung
                 
                 // Schatten aktivieren für alle Meshes im Modell
