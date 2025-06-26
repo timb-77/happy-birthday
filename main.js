@@ -160,8 +160,8 @@ function initBouquet() {
     scene.background = new THREE.Color(0xffffff);
     
     const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    camera.position.z = 6;  // Etwas weiter weg für bessere Übersicht
-    camera.position.y = 1;  // Nicht mehr so weit oben
+    camera.position.z = 3;  // Näher ran für größeren Blumenstrauß
+    camera.position.y = 0.5;  // Etwas höher
     camera.lookAt(0, 0, 0);
     
     const renderer = new THREE.WebGLRenderer({ 
@@ -171,103 +171,136 @@ function initBouquet() {
     });
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    // Verbesserte Beleuchtung
+    // Optimierte Beleuchtung für das 3D-Modell
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(5, 5, 5);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
     scene.add(directionalLight);
 
     const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
     directionalLight2.position.set(-5, 3, -5);
     scene.add(directionalLight2);
 
-    // Blumenstrauß erstellen
-    const bouquet = new THREE.Group();
-    
-    // Mehr Farben für einen prächtigeren Strauß
-    const flowerColors = [
-        0x8B0000,  // Dunkelrot
-        0xFFA500,  // Orange
-        0xFFD700,  // Gold/Gelb
-        0x800080,  // Lila
-        0x9400D3,  // Violett
-        0xFF1493,  // Pink
-        0xFF69B4,  // Rosa
-        0x8B0000,  // Dunkelrot
-        0xFFA500,  // Orange
-        0x800080,  // Lila
-        0xFF1493,  // Pink
-        0xFFD700   // Gold/Gelb
-    ];
+    let bouquet = null;
+    let animationFrameId = null;
 
-    // Mehr Positionen für die Blumen, in einer natürlicheren Anordnung
-    const flowerPositions = [
-        // Zentrale Blumen
-        [0, 0.5, 0],      // Mittlere Hauptblume
-        [-0.4, 0.3, 0.2], // Links oben
-        [0.4, 0.4, 0.1],  // Rechts oben
-        [0, 0.6, -0.3],   // Hinten mitte
-        
-        // Äußere Blumen
-        [-0.8, -0.2, 0.4],  // Links außen
-        [0.8, -0.1, 0.3],   // Rechts außen
-        [0.5, 0.2, -0.5],   // Hinten rechts
-        [-0.5, 0.1, -0.4],  // Hinten links
-        
-        // Füllblumen
-        [-0.3, -0.3, 0.2],  // Unten links
-        [0.3, -0.2, 0.1],   // Unten rechts
-        [0, -0.4, -0.2],    // Unten mitte
-        [0.2, 0.3, -0.3]    // Oben mitte
-    ];
+    // Warte kurz und prüfe dann ob GLTFLoader verfügbar ist
+    function checkAndLoadGLTF() {
+        if (typeof THREE.GLTFLoader === 'undefined') {
+            console.log('GLTFLoader noch nicht verfügbar, warte...');
+            // Versuche es nach 500ms nochmal
+            setTimeout(checkAndLoadGLTF, 500);
+            return;
+        }
 
-    // Verschiedene Größen für mehr Dynamik
-    const flowerSizes = [
-        1.2, // Hauptblume
-        1.0, 1.0, 1.0,  // Obere Blumen
-        0.9, 0.9, 0.9, 0.9,  // Äußere Blumen
-        0.8, 0.8, 0.8, 0.8   // Füllblumen
-    ];
-
-    // Erstelle alle Blumen
-    flowerColors.forEach((color, i) => {
-        const flower = createFlower(color, flowerSizes[i]);
-        flower.position.set(...flowerPositions[i]);
-        
-        // Zufällige Rotation für natürlicheres Aussehen
-        flower.rotation.x = Math.random() * 0.4 - 0.2;
-        flower.rotation.z = Math.random() * 0.4 - 0.2;
-        flower.rotation.y = Math.random() * Math.PI * 2; // Volle Rotation um Y-Achse möglich
-        
-        bouquet.add(flower);
-    });
-
-    // Füge einige Blätter hinzu
-    const leafColor = 0x228B22; // Waldgrün
-    for (let i = 0; i < 8; i++) {
-        const leaf = createLeaf(leafColor, 1.2);
-        leaf.position.set(
-            Math.random() * 2 - 1,  // X: -1 bis 1
-            Math.random() * -0.5,    // Y: Unterer Bereich
-            Math.random() * 2 - 1   // Z: -1 bis 1
-        );
-        leaf.rotation.x = Math.random() * 0.5 - 0.25;
-        leaf.rotation.y = Math.random() * Math.PI * 2;
-        leaf.rotation.z = Math.random() * 0.5 - 0.25;
-        bouquet.add(leaf);
+        console.log('GLTFLoader ist verfügbar, lade Modell...');
+        loadGLTFModel();
     }
 
-    scene.add(bouquet);
-    bouquet.rotation.x = -0.2;  // Leichte Neigung nach vorne
+    function loadGLTFModel() {
+        // GLTF-Loader erstellen
+        const loader = new THREE.GLTFLoader();
 
-    let animationFrameId;
+        console.log('Versuche GLTF-Modell zu laden:', 'res/flower_bouquet/scene.gltf');
+
+        // 3D-Modell laden
+        loader.load(
+            'res/flower_bouquet/scene.gltf',
+            function (gltf) {
+                console.log('GLTF-Modell erfolgreich geladen:', gltf);
+                bouquet = gltf.scene;
+                
+                // Modell viel größer skalieren und besser positionieren
+                bouquet.scale.set(8, 8, 8);  // Viel größer machen (war 2,2,2)
+                bouquet.position.set(0, -0.5, 0);  // Weniger nach unten verschieben
+                bouquet.rotation.x = -0.1;  // Leichte Neigung
+                
+                // Schatten aktivieren für alle Meshes im Modell
+                bouquet.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        
+                        // Material-Optimierungen für bessere Darstellung
+                        if (child.material) {
+                            child.material.needsUpdate = true;
+                        }
+                    }
+                });
+                
+                scene.add(bouquet);
+                console.log('GLTF-Modell zur Szene hinzugefügt');
+                
+                // Animation starten
+                animate();
+            },
+            function (progress) {
+                console.log('Loading progress: ', (progress.loaded / progress.total * 100) + '%');
+            },
+            function (error) {
+                console.error('Fehler beim Laden des GLTF-Modells:', error);
+                console.log('Versuche Fallback-Blumenstrauß zu erstellen...');
+                createFallbackBouquet();
+            }
+        );
+    }
+
+    function createFallbackBouquet() {
+        console.log('Erstelle Fallback-Blumenstrauß...');
+        
+        // Erstelle einen einfachen, aber schönen Blumenstrauß als Fallback
+        const fallbackBouquet = new THREE.Group();
+        
+        // Mehrere Blumen in verschiedenen Farben
+        const colors = [0xFF69B4, 0xFF1493, 0xFFA500, 0xFFD700, 0x9400D3];
+        const positions = [
+            [0, 0, 0],
+            [-0.5, 0.2, 0.3],
+            [0.5, 0.1, 0.2],
+            [-0.3, -0.2, -0.2],
+            [0.3, -0.1, -0.3]
+        ];
+        
+        colors.forEach((color, i) => {
+            // Blüte
+            const petalGeometry = new THREE.SphereGeometry(0.3, 8, 6);
+            const petalMaterial = new THREE.MeshPhongMaterial({ color: color });
+            const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+            petal.position.set(...positions[i]);
+            petal.position.y += 0.5;
+            fallbackBouquet.add(petal);
+            
+            // Stiel
+            const stemGeometry = new THREE.CylinderGeometry(0.02, 0.02, 1);
+            const stemMaterial = new THREE.MeshPhongMaterial({ color: 0x228B22 });
+            const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+            stem.position.set(...positions[i]);
+            fallbackBouquet.add(stem);
+        });
+        
+        bouquet = fallbackBouquet;
+        scene.add(bouquet);
+        animate();
+    }
+
     function animate() {
         animationFrameId = requestAnimationFrame(animate);
-        bouquet.rotation.y += 0.003; // Langsamere Rotation
-        bouquet.position.y = Math.sin(Date.now() * 0.001) * 0.1;
+        
+        if (bouquet) {
+            // Sanfte Rotation
+            bouquet.rotation.y += 0.005;
+            // Leichte Auf-und-Ab-Bewegung
+            bouquet.position.y = (bouquet.position.y || 0) + Math.sin(Date.now() * 0.001) * 0.001;
+        }
+        
         renderer.render(scene, camera);
     }
 
@@ -278,9 +311,13 @@ function initBouquet() {
     });
     resizeObserver.observe(canvas);
 
-    animate();
+    // Starte die Überprüfung
+    checkAndLoadGLTF();
+
     return () => {
-        cancelAnimationFrame(animationFrameId);
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
         resizeObserver.disconnect();
         scene.traverse(object => {
             if (object.geometry) object.geometry.dispose();
