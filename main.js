@@ -347,7 +347,112 @@ Model License:
 If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
 This work is based on "Flower Bouquet" (https://sketchfab.com/3d-models/flower-bouquet-48e92013548247a9ad486dc13110c9b4) by icecool (https://sketchfab.com/icecool) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)`;
 
-    alert(licenseText);
+    // Erstelle eine mobile-freundliche Modal-Box
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        padding: 20px;
+        box-sizing: border-box;
+    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        max-width: 90%;
+        max-height: 80%;
+        overflow-y: auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        font-family: Arial, sans-serif;
+        line-height: 1.4;
+    `;
+
+    const title = document.createElement('h3');
+    title.textContent = 'License Information';
+    title.style.cssText = `
+        margin: 0 0 15px 0;
+        color: #FF1493;
+        text-align: center;
+        font-size: 1.2em;
+    `;
+
+    const content = document.createElement('pre');
+    content.textContent = licenseText;
+    content.style.cssText = `
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        margin: 0 0 20px 0;
+        color: #333;
+    `;
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'Schließen';
+    closeButton.style.cssText = `
+        background: linear-gradient(45deg, #FF69B4, #FF1493);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    `;
+
+    closeButton.onclick = function() {
+        document.body.removeChild(modal);
+    };
+
+    // Touch-Event für mobile Geräte
+    closeButton.ontouchstart = function() {
+        this.style.transform = 'scale(0.95)';
+    };
+    closeButton.ontouchend = function() {
+        this.style.transform = 'scale(1)';
+    };
+
+    // Modal schließen beim Klick auf den Hintergrund
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    };
+
+    modalContent.appendChild(title);
+    modalContent.appendChild(content);
+    modalContent.appendChild(closeButton);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
+    // Verhindere Scrollen im Hintergrund
+    document.body.style.overflow = 'hidden';
+    
+    // Stelle Scrollen wieder her, wenn Modal geschlossen wird
+    const originalClose = closeButton.onclick;
+    closeButton.onclick = function() {
+        document.body.style.overflow = '';
+        originalClose();
+    };
+    
+    const originalModalClick = modal.onclick;
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            document.body.style.overflow = '';
+            originalModalClick(e);
+        }
+    };
 }
 
 // Neue Funktion für Blätter
