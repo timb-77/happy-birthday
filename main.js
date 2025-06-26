@@ -219,8 +219,8 @@ function initBouquet() {
                 bouquet = gltf.scene;
                 
                 // Modell viel größer skalieren und besser positionieren
-                bouquet.scale.set(9, 9, 9);  // Viel größer machen (war 2,2,2)
-                bouquet.position.set(0, -1.7, 0);  // Weniger nach unten verschieben
+                bouquet.scale.set(10, 10, 10);  // Viel größer machen (war 2,2,2)
+                bouquet.position.set(0, -2.0, 0);  // Weniger nach unten verschieben
                 bouquet.rotation.x = -0.1;  // Leichte Neigung
                 
                 // Schatten aktivieren für alle Meshes im Modell
@@ -331,6 +331,23 @@ function initBouquet() {
         });
         renderer.dispose();
     };
+}
+
+// Funktion zum Anzeigen der Lizenzinformationen
+function showLicense() {
+    const licenseText = `Model Information:
+• title: Flower Bouquet
+• source: https://sketchfab.com/3d-models/flower-bouquet-48e92013548247a9ad486dc13110c9b4
+• author: icecool (https://sketchfab.com/icecool)
+
+Model License:
+• license type: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+• requirements: Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Flower Bouquet" (https://sketchfab.com/3d-models/flower-bouquet-48e92013548247a9ad486dc13110c9b4) by icecool (https://sketchfab.com/icecool) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)`;
+
+    alert(licenseText);
 }
 
 // Neue Funktion für Blätter
