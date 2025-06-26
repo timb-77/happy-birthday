@@ -22,66 +22,6 @@ function isHighPerformanceDevice() {
            window.devicePixelRatio >= 2;
 }
 
-// Funktion zum Erstellen einer Blume
-function createFlower(color, size) {
-    const group = new THREE.Group();
-    
-    // Mehr Blütenblätter
-    const petalCount = 12;
-    const petalGeometry = new THREE.ConeGeometry(size * 0.2, size * 0.5, 8);
-    const petalMaterial = new THREE.MeshPhongMaterial({
-        color: color,
-        shininess: 100,
-        side: THREE.DoubleSide
-    });
-
-    // Innere und äußere Blütenblätter
-    for (let i = 0; i < petalCount; i++) {
-        // Äußere Blütenblätter
-        const petal = new THREE.Mesh(petalGeometry, petalMaterial);
-        petal.position.y = size * 0.25;
-        petal.rotation.z = (Math.PI * 2 / petalCount) * i;
-        petal.rotation.x = Math.PI / 3;
-        group.add(petal);
-
-        // Innere Blütenblätter, etwas kleiner und versetzt
-        if (i % 2 === 0) {
-            const innerPetal = new THREE.Mesh(petalGeometry, petalMaterial);
-            innerPetal.scale.set(0.7, 0.7, 0.7);
-            innerPetal.position.y = size * 0.2;
-            innerPetal.rotation.z = (Math.PI * 2 / petalCount) * i + Math.PI / petalCount;
-            innerPetal.rotation.x = Math.PI / 3;
-            group.add(innerPetal);
-        }
-    }
-
-    // Blütenmitte mit mehr Details
-    const centerGeometry = new THREE.SphereGeometry(size * 0.18, 16, 16);
-    const centerMaterial = new THREE.MeshPhongMaterial({
-        color: 0xffd700,
-        shininess: 80
-    });
-    const center = new THREE.Mesh(centerGeometry, centerMaterial);
-    center.position.y = size * 0.25;
-    group.add(center);
-
-    // Stängel mit Verdickung am oberen Ende
-    const stemGeometry = new THREE.CylinderGeometry(
-        size * 0.04, // Oben dicker
-        size * 0.02, // Unten dünner
-        size * 1.2   // Etwas länger
-    );
-    const stemMaterial = new THREE.MeshPhongMaterial({
-        color: 0x228B22,
-        shininess: 30
-    });
-    const stem = new THREE.Mesh(stemGeometry, stemMaterial);
-    stem.position.y = -size * 0.35;
-    group.add(stem);
-
-    return group;
-}
-
 // Funktion für Hintergrund-Partikel
 function initBackgroundParticles() {
     const canvas = document.getElementById('background-canvas');
@@ -424,13 +364,13 @@ This work is based on "Flower Bouquet" (https://sketchfab.com/3d-models/flower-b
         max-width: 90%;
         max-height: 80%;
         overflow-y: auto;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         font-family: Arial, sans-serif;
         line-height: 1.4;
     `;
 
     const title = document.createElement('h3');
-    title.textContent = 'License Information';
+    title.textContent = 'Lizenzinformationen 3D-Modell Blumenstrauß';
     title.style.cssText = `
         margin: 0 0 15px 0;
         color: #FF1493;
@@ -505,28 +445,6 @@ This work is based on "Flower Bouquet" (https://sketchfab.com/3d-models/flower-b
             originalModalClick(e);
         }
     };
-}
-
-// Neue Funktion für Blätter
-function createLeaf(color, size) {
-    const group = new THREE.Group();
-    
-    // Blattform als abgeflachter, gebogener Kegel
-    const leafGeometry = new THREE.ConeGeometry(size * 0.15, size * 0.6, 8, 1, true);
-    leafGeometry.scale(1, 1, 0.2); // Abflachen
-    
-    // Materialien mit verschiedenen Grüntönen
-    const leafMaterial = new THREE.MeshPhongMaterial({
-        color: color,
-        shininess: 30,
-        side: THREE.DoubleSide
-    });
-
-    const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
-    leaf.rotation.x = Math.PI / 2; // Horizontal ausrichten
-    group.add(leaf);
-
-    return group;
 }
 
 // Hauptinitialisierung
