@@ -239,8 +239,60 @@ function initBouquet() {
                 scene.add(bouquet);
                 console.log('GLTF-Modell zur Szene hinzugefügt');
                 
+                // Speichere Referenz für Animation
+                window.currentBouquet = bouquet;
+                
                 // Animation starten
                 animate();
+
+                // Doppelklick/Doppeltipp Event für Happy Birthday Animation
+                let lastTapTime = 0;
+                let touchCount = 0;
+                
+                // Desktop Doppelklick
+                canvas.addEventListener('dblclick', triggerHappyBirthdayAnimation);
+                
+                // Mobile Touch-Events (robustere Implementierung)
+                canvas.addEventListener('touchstart', function(e) {
+                    e.preventDefault(); // Verhindere Standard-Touch-Verhalten
+                    touchCount++;
+                    
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTapTime;
+                    
+                    if (tapLength < 300 && tapLength > 0 && touchCount === 2) {
+                        // Doppeltipp erkannt
+                        console.log('Doppeltipp erkannt!');
+                        triggerHappyBirthdayAnimation();
+                        touchCount = 0; // Reset
+                    } else if (tapLength > 300) {
+                        touchCount = 1; // Erster Tap
+                    }
+                    
+                    lastTapTime = currentTime;
+                    
+                    // Reset nach 500ms wenn kein zweiter Tap
+                    setTimeout(() => {
+                        if (touchCount === 1) {
+                            touchCount = 0;
+                        }
+                    }, 500);
+                }, { passive: false });
+                
+                // Alternative: Einfacher Single-Touch für mobile (als Fallback)
+                let singleTouchCount = 0;
+                canvas.addEventListener('click', function(e) {
+                    singleTouchCount++;
+                    if (singleTouchCount === 2) {
+                        console.log('Doppelklick über click-Event erkannt!');
+                        triggerHappyBirthdayAnimation();
+                        singleTouchCount = 0;
+                    }
+                    
+                    setTimeout(() => {
+                        singleTouchCount = 0;
+                    }, 400);
+                });
             },
             function (progress) {
                 console.log('Loading progress: ', (progress.loaded / progress.total * 100) + '%');
@@ -530,4 +582,160 @@ function copyLink() {
     } catch (err) {
         console.warn('Clipboard API nicht verfügbar:', err);
     }
+}
+
+// Happy Birthday Animation
+function triggerHappyBirthdayAnimation() {
+    console.log('🎉 Happy Birthday Animation gestartet!');
+    
+    // Erstelle Overlay für die Animation
+    const animationOverlay = document.createElement('div');
+    animationOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        overflow: hidden;
+    `;
+    document.body.appendChild(animationOverlay);
+
+    // Happy Birthday Text
+    const birthdayText = document.createElement('div');
+    birthdayText.innerHTML = '🎉 HAPPY BIRTHDAY! 🎂';
+    birthdayText.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 3em;
+        font-weight: bold;
+        color: #FF1493;
+        text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        text-align: center;
+        white-space: nowrap;
+        animation: birthdayPop 2s ease-out forwards;
+    `;
+
+    // CSS Animation für den Text
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes birthdayPop {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    animationOverlay.appendChild(birthdayText);
+
+    // Konfetti erstellen
+    const confettiColors = ['#FF69B4', '#FF1493', '#FFD700', '#FF6347', '#9370DB', '#00CED1', '#32CD32'];
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                background: ${confettiColors[Math.floor(Math.random() * confettiColors.length)]};
+                left: ${Math.random() * 100}%;
+                top: -10px;
+                border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                animation: confettiFall ${2 + Math.random() * 3}s linear forwards;
+            `;
+            animationOverlay.appendChild(confetti);
+            
+            // Entferne Konfetti nach Animation
+            setTimeout(() => {
+                if (confetti.parentNode) {
+                    confetti.parentNode.removeChild(confetti);
+                }
+            }, 5000);
+        }, i * 50);
+    }
+
+    // Funkelnde Sterne
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+            const star = document.createElement('div');
+            star.innerHTML = '✨';
+            star.style.cssText = `
+                position: absolute;
+                left: ${Math.random() * 100}%;
+                top: ${Math.random() * 100}%;
+                font-size: ${1 + Math.random() * 2}em;
+                animation: sparkle ${1 + Math.random() * 2}s ease-in-out infinite;
+                animation-delay: ${Math.random() * 2}s;
+            `;
+            animationOverlay.appendChild(star);
+            
+            // Entferne Sterne nach 4 Sekunden
+            setTimeout(() => {
+                if (star.parentNode) {
+                    star.parentNode.removeChild(star);
+                }
+            }, 4000);
+        }, i * 100);
+    }
+
+    // Herz-Partikel
+    const hearts = ['💖', '💕', '💗', '💝', '💘'];
+    for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+            const heart = document.createElement('div');
+            heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.cssText = `
+                position: absolute;
+                left: ${Math.random() * 100}%;
+                top: ${Math.random() * 100}%;
+                font-size: ${1.5 + Math.random() * 1}em;
+                animation: sparkle ${2 + Math.random() * 2}s ease-in-out infinite;
+                animation-delay: ${Math.random() * 3}s;
+            `;
+            animationOverlay.appendChild(heart);
+            
+            // Entferne Herzen nach 5 Sekunden
+            setTimeout(() => {
+                if (heart.parentNode) {
+                    heart.parentNode.removeChild(heart);
+                }
+            }, 5000);
+        }, i * 150);
+    }
+
+    // Blumenstrauß-Rotation verstärken während der Animation
+    if (window.currentBouquet) {
+        let animationTime = 0;
+        const enhancedAnimation = setInterval(() => {
+            animationTime += 50;
+            if (window.currentBouquet && animationTime < 3000) {
+                window.currentBouquet.rotation.y += 0.02; // Schnellere Rotation
+                window.currentBouquet.position.y += Math.sin(animationTime * 0.01) * 0.005; // Mehr Bewegung
+            } else {
+                clearInterval(enhancedAnimation);
+            }
+        }, 50);
+    }
+
+    // Entferne das gesamte Overlay nach 6 Sekunden
+    setTimeout(() => {
+        if (animationOverlay.parentNode) {
+            animationOverlay.parentNode.removeChild(animationOverlay);
+        }
+        if (style.parentNode) {
+            style.parentNode.removeChild(style);
+        }
+    }, 6000);
 }
