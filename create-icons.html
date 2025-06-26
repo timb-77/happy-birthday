@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+        .icon-preview { display: inline-block; margin: 10px; text-align: center; }
+        canvas { border: 1px solid #ccc; margin: 5px; background: white; }
+        button { background: #FF69B4; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #FF1493; }
+        .download-links { margin-top: 20px; }
+        .download-links a { display: block; margin: 5px 0; color: #FF1493; text-decoration: none; }
+        .download-links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>🎨 Happy Birthday App Icons Generator</h1>
+    <p>Klicke auf "Icons generieren" um alle benötigten App-Icons zu erstellen:</p>
+    
+    <button onclick="generateAllIcons()">🎉 Icons generieren</button>
+    <button onclick="downloadAll()">📥 Alle Icons herunterladen</button>
+    
+    <div id="icons-container"></div>
+    <div id="download-links" class="download-links"></div>
+
+    <script>
+        const sizes = [16, 32, 76, 120, 152, 180];
+        const canvases = {};
+
+        function createFlowerIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Hintergrund-Gradient (Pink)
+            const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+            gradient.addColorStop(0, '#FF69B4');
+            gradient.addColorStop(1, '#FF1493');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Blume zeichnen
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const petalSize = size * 0.15;
+            
+            // Blütenblätter (weiß mit Schatten)
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.shadowBlur = size * 0.02;
+            ctx.fillStyle = '#FFFFFF';
+            
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI * 2) / 8;
+                const x = centerX + Math.cos(angle) * petalSize;
+                const y = centerY + Math.sin(angle) * petalSize;
+                
+                ctx.beginPath();
+                ctx.ellipse(x, y, petalSize * 0.6, petalSize * 0.3, angle, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Blütenmitte (gelb)
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, petalSize * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Stiel (grün) - nur bei größeren Icons
+            if (size >= 76) {
+                ctx.fillStyle = '#228B22';
+                ctx.fillRect(centerX - size * 0.02, centerY + petalSize * 0.3, size * 0.04, size * 0.3);
+            }
+            
+            return canvas;
+        }
+
+        function generateAllIcons() {
+            const container = document.getElementById('icons-container');
+            const downloadContainer = document.getElementById('download-links');
+            container.innerHTML = '';
+            downloadContainer.innerHTML = '<h3>📥 Download Links:</h3>';
+            
+            sizes.forEach(size => {
+                const canvas = createFlowerIcon(size);
+                canvases[size] = canvas;
+                
+                // Vorschau erstellen
+                const preview = document.createElement('div');
+                preview.className = 'icon-preview';
+                preview.innerHTML = `<div>${size}x${size}</div>`;
+                preview.appendChild(canvas);
+                container.appendChild(preview);
+                
+                // Download-Link erstellen
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `icon-${size}.png`;
+                    link.textContent = `📱 icon-${size}.png herunterladen`;
+                    downloadContainer.appendChild(link);
+                });
+            });
+            
+            console.log('✅ Alle Icons generiert!');
+        }
+
+        function downloadAll() {
+            sizes.forEach(size => {
+                if (canvases[size]) {
+                    canvases[size].toBlob(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `icon-${size}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    });
+                }
+            });
+        }
+
+        // Automatisch beim Laden generieren
+        window.addEventListener('load', generateAllIcons);
+    </script>
+</body>
+</html>
